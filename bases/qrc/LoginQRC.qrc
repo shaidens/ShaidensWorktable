@@ -1,0 +1,12 @@
+<RCC>
+  <qresource prefix="image">
+    <file>../../res/icon/Shaiden’s WorkingTable.png</file>
+    <file>../../res/icon/complete.png</file>
+    <file>../../res/icon/logo.png</file>
+    <file>../../res/icon/logo2.png</file>
+    <file>../../res/icon/logo_2.ico</file>
+    <file>../../res/icon/unkown_user.png</file>
+    <file>../../res/3-2.jpg</file>
+    <file>../../res/3.jpg</file>
+  </qresource>
+</RCC>
