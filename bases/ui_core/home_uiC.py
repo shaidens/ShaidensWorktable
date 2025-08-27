@@ -14,10 +14,10 @@ from PySide2.QtGui import QScreen
 from PySide2.QtWidgets import QApplication
 from qfluentwidgets import FluentWindow
 from qfluentwidgets import FluentIcon as FIF
-
+from qfluentwidgets import (InfoBar, InfoBarPosition)
 # 子界面导入
-from configures.bases.gui.default.Home_GUI import HomePage
-from configures.bases.gui.default.SoftwareLib_GUIcore import softwareLib_ui
+from bases.ui_core.software_uiC import softwareLib_ui
+from bases.ui.home import HomePage
 
 
 class Ui_MainWindow(FluentWindow):
@@ -65,11 +65,44 @@ class Ui_MainWindow(FluentWindow):
 
     def retranslateUi(self):
         self.setWindowTitle(QCoreApplication.translate("MainWindow", u"Shaiden's \u5de5\u4f5c\u53f0", None))
-
+    def show_top_success(self,msg:str,time=3000) -> None:
+        InfoBar.success(
+            title='欧耶~ 🥳',
+            content=msg,
+            parent=self,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=time,
+            orient=Qt.Horizontal,
+        )
+    def show_top_info(self,msg:str,time=1000) -> None:
+        InfoBar.info(
+            title='qwq',
+            content=msg,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=time,
+            parent=self
+        )
+    def show_top_error(self,msg:str,time=5000) -> None:
+        InfoBar.error(
+            title='Error:(',
+            content="😑"+msg,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=time,
+            parent=self
+        )
 
 def execute():
-    from main import Main
-    main = Main()
+    # from main import Main
+
+
     w = Ui_MainWindow()
     w.show()
-    main.app.exec_()
+    w.show_top_success("登陆成功！让我们开始吧🥳🥳")
+    # print(main.app ,2)
+    # main.app.exec_()
+    # main.app.exec_()

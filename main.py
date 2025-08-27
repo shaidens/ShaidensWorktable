@@ -1,61 +1,71 @@
 
-import threading,os
-import sys,ctypes
+import threading, os
+import sys, ctypes
 
 from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import Qt
 
 from qfluentwidgets import (setTheme,Theme)
-from configures.bases.gui.default import Login_GUIcore
+from bases.ui_core import login_uiC,home_uiC
+
+import sys, os
+import PySide2
+import faulthandler
+faulthandler.enable() #debug
 setTheme(Theme.DARK)
-# 资源文件目录访问
-def source_path(relative_path):
-    # 是否Bundle Resource
-    if getattr(sys, 'frozen', False):
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
-
-# 修改当前工作目录，使得资源文件可以被正确访问
-cd = source_path('')
-os.chdir(cd)
-
-
+#Pyside 插件平台初始化
+dir_name = os.path.dirname(PySide2.__file__)
+plugin_path = os.path.join(dir_name, 'plugins', 'platforms')
+os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = plugin_path
+print(plugin_path)
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("starter")
 
+#High DPI适配
 QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
 QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 
 
-
-
 # if not QApplication.instance():
 class Main(object):
-    app: QApplication = None
+    _instance = None
     _instance_lock = threading.Lock()
+    app: QApplication = None
+
+    def __init__(self):
+        # 只初始化一次
+        if not hasattr(self, '_initialized'):
+            self._initialized = True
+            # 在这里添加其他初始化逻辑
 
     def __new__(cls, *args, **kwargs) -> object:
-        if not hasattr(Main, "_instance"):
-            with Main._instance_lock:
-                if not hasattr(Main, "_instance"):
-                    Main._instance = object.__new__(cls)
-        return Main._instance
+        if not cls._instance:
+            with cls._instance_lock:
+                if not cls._instance:
+                    cls._instance = super(Main, cls).__new__(cls)
+
+        return cls._instance
+
+    @classmethod
+    def get_instance(cls) -> 'Main':
+        """获取单例实例的类方法"""
+        return cls()
 
 
 def run():
-    main:object = Main()
+    global main
+    main = Main()
     main.app = QApplication(sys.argv)
-    w = Login_GUIcore.login_ui()
+    print(main, 1)
+    w = login_uiC.login_ui()
     w.show()
     w.createSubInterface()
-    # import msgWidget
-    # a=msgWidget.MsgWidget_Page()
-    # a.show()
+
     main.app.exec_()
 
+def get_main_singleton():
+    return Main.get_instance()
 
 if __name__ == '__main__':
     run()

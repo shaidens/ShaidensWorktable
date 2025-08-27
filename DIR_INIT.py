@@ -8,7 +8,7 @@ else:
 os.chdir(root_dir)
 
 bases_dir = ["ui", "ui_core", "qrc", "res", "api", r"\configures\groups", r"\configures\active", r"runtimes\web_socket"]
-data_dir = []
+data_dir = ["temp"]
 plugins_dir = []
 
 for __base_dir__ in bases_dir:
@@ -24,5 +24,5 @@ for __base_dir__ in bases_dir:
 #             os.makedirs(rf".\bases\{__base_dir__}")
 #         except FileExistsError:
 #             continue
-os.mkdir(r".\data")
+os.mkdir(r".\data\temp")
 os.mkdir(r".\plugins")

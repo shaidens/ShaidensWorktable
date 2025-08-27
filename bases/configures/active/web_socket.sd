@@ -1,6 +1,6 @@
 #Group Setting for SdmerShaidenTeam
 #@author: SdmerShaidenTeam
-SERVER_HOST = 127.0.0.1
+SERVER_HOST = api.shaiden.site
 SERVER_PORT = 14514
 SERVER_PASSWORD = null
 

@@ -1,27 +1,28 @@
 
-import re,os
 
-from PySide2.QtCore import Qt,QSize,QEventLoop,QTimer
-from PySide2.QtGui import QIcon,QScreen
+import re, os, sys
+from PySide2.QtCore import Qt, QSize, QEventLoop, QTimer
+from PySide2.QtGui import QIcon, QScreen
 from PySide2.QtWidgets import QApplication
-from qframelesswindow import FramelessMainWindow,FramelessWindow,StandardTitleBar
+from qframelesswindow import FramelessMainWindow, FramelessWindow, StandardTitleBar
 from qfluentwidgets import (InfoBarIcon,
                             Flyout,
                             FlyoutAnimationType,
                             SplashScreen,
                             InfoBar,
                             InfoBarPosition,
-                            Theme,setTheme
+                            Theme, setTheme
                             )
+sys.path.append('..')
+from ..ui.login import LoginPage
+from ..api import (core, web)
+
+from bases.api.base import NoConnection, MissedConfigures
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("starter")
 setTheme(Theme.DARK)
 
-from configures.bases.gui.default.Login_GUI import LoginPage
-#由于本文件的运行由main.py发起，所以默认的工作路径就是工程根目录.../Shaiden's,所以导入时需要如上。
 
-from functions import API
-# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("starter")
-# class login_ui(FramelessMainWindow, Ui_MainWindow):
-class login_ui(FramelessMainWindow, LoginPage):
+class login_ui(FramelessMainWindow, LoginPage): # class login_ui(FramelessMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super().__init__()
@@ -62,40 +63,46 @@ class login_ui(FramelessMainWindow, LoginPage):
         self.imi_status=self.if_memorize_invitation.isChecked()
         if self.if_memorize_invitation.if_next_show_tips == True:
             if self.imi_status:
-                self.func.configure_change("user","IMI_STATUS",True)
-                self.func.configure_change("user","LATEST_INVITATION",self.invitation_edit.text())
+                self.core_api.configure_change("user","IMI_STATUS",True)
+                self.core_api.configure_change("user","LATEST_INVITATION",self.invitation_edit.text())
                 self.show_top_info("我的左眼用来记住你🙂~")
             else:
-                self.func.configure_change("user","IMI_STATUS",False)
+                self.core_api.configure_change("user","IMI_STATUS",False)
                 self.show_top_info("我的右眼用来忘记你🙃~")
         else:
             if self.imi_status:
-                self.func.configure_change("user","IMI_STATUS",True)
+                self.core_api.configure_change("user","IMI_STATUS",True)
             else:
-                self.func.configure_change("user","IMI_STATUS",False)
+                self.core_api.configure_change("user","IMI_STATUS",False)
             self.if_memorize_invitation.if_next_show_tips = True
+
     def createSubInterface(self) -> None:
         loop = QEventLoop(self)
         QTimer.singleShot(500,loop.quit)
         loop.exec_()
         #此处进行初始化后端配置
         try:
-            self.func = API()
-            result = self.func.Set_up_init(r"C:/Users/shaid/Desktop/ShaidenWorkProject/Shaiden's/configures/group/test/") #此处设置配置组
+            self.core_api = core.API()
+            self.web_api = web.API()
+            result = self.core_api.config_init()#r"C:/Users/shaid/Desktop/ShaidenWorkProject/Shaiden's(重定向)/Shaiden's(new)/bases/configures/groups/SST/") #此处设置配置组
 
-            if self.func.IMI_STATUS:
-                self.invitation_edit.setText(self.func.LATEST_INVITATION)
+            if self.core_api.IMI_STATUS:
+                self.invitation_edit.setText(self.core_api.LATEST_INVITATION)
                 self.if_memorize_invitation.if_next_show_tips = False
                 self.if_memorize_invitation.setChecked(True)
 
-            if type(result) is str:
+            if isinstance(result, str):
                 self.show_top_error(result)
-            elif self.func.IMI_STATUS:
+            elif self.core_api.IMI_STATUS:
                 self.complete_btn_pressed()
-        except AttributeError as e:
+        except MissedConfigures as e:
+            self.splashScreen.close()
             self.show_top_error("你的工作台缺少必要的配置文件！请联系Shaiden解决 [%s]" % str(e))
-
-
+            return
+        except NoConnection as e:
+            self.splashScreen.close()
+            self.show_top_error("无法连接到服务器😑 [%s]" % str(e))
+            return
         self.splashScreen.close()
 
     def complete_btn_pressed(self) -> None:
@@ -103,27 +110,27 @@ class login_ui(FramelessMainWindow, LoginPage):
         if edit and bool(re.match(r"^[A-Za-z0-9_-]*$",edit)):
             self.show_top_info("正在登陆中...")
             #伪延迟start
-            loop = QEventLoop(self)
-            QTimer.singleShot(250, loop.quit)
-            loop.exec_()
+            # loop = QEventLoop(self)
+            # QTimer.singleShot(250, loop.quit)
+            # loop.exec_()
 
-            result=self.func.login(edit)
-            if type(result) is dict:
-                if self.func.IMI_STATUS:
-                    self.func.configure_change("user","LATEST_INVITATION",edit)
+            result=self.web_api.login(edit)
+            if isinstance(result, dict):
+                if self.core_api.IMI_STATUS:
+                    self.core_api.configure_change("user","LATEST_INVITATION",edit)
                 self.show_top_success("登陆成功！让我们开始吧🥳🥳")
                 self.infoBar.close()
-                #伪延迟end
-                loop = QEventLoop(self)
-                QTimer.singleShot(500, loop.quit)
-                loop.exec_()
+                # #伪延迟end
+                # loop = QEventLoop(self)
+                # QTimer.singleShot(500, loop.quit)
+                # loop.exec_()
 
-                self.hide()
-                self.func.root_ui_exec()
+                self.hide() #当界面无端消失地报错时，可以将此行注释以显示登陆界面
+                self.core_api.root_ui_exec()
                 # ...Function 登陆完成跳转界面
             elif result is None:
                 self.show_edit_error("服务器不接受你的邀请函，因为它好像不存在😣")
-            elif type(result) is str:
+            elif isinstance(result, str):
                 self.show_edit_error("{0}".format(result))
             self.infoBar.close()
         elif edit:

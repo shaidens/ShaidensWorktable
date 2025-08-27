@@ -1,24 +1,11 @@
 
-from base import *
+from .base import *
 import sys
 sys.path.append("..")
-from runtimes.web_socket.client import Client,setup
-def get_icons_from_url(url, SaveFileName: str):
-    """
-    用于通过request模块获取icon图片的函数
-    :param url:
-    :param SaveFileName:
-    :return:
-    """
-    try:
-        response = requests.get(url)
-        image_data = response.content
-        filePath = r"./res/icon/software/{0}".format(SaveFileName)
-        with open(filePath, 'wb') as f:
-            f.write(image_data)
-            return os.path.abspath(filePath)
-    except Exception as e:
-        return False
+from ..runtimes.web_socket.client import Client,setup
+
+
+
 
 
 class DownloadThread(QThread):
@@ -106,13 +93,13 @@ class API( object):
             cls._instance = object.__new__(cls, *args, **kw)
         return cls._instance
     def __init__(self):
-        setup() #网络配置文件读取初始化
+        # setup() #网络配置文件读取初始化
         self.web_socket = Client()
-        res = self.web_socket.init()
-        if res is not True:
+        result = self.web_socket.init()
+        if result is not True:
             logging.error("[web.py]WebSocket init failed.")
             # 这意味着调用端需作出捕捉
-            raise Exception("WebSocket init failed.")
+            raise NoConnection("WebSocket init failed.")
         logging.info("[web.py]Init finished.")
 
     def login(self, invitation_code: str, loading_ui=None):
@@ -245,4 +232,20 @@ class API( object):
         #         logging.error(f"解压文件时出错: {str(e)}")
         #         return False
         # return True
-
+    @staticmethod
+    def get_icons_from_url(url, SaveFileName: str):
+        """
+        用于通过request模块获取icon图片的函数
+        :param url:
+        :param SaveFileName:
+        :return:
+        """
+        try:
+            response = requests.get(url)
+            image_data = response.content
+            file_path = APPLICATION_ROOT_DIR + r"\bases\res\icon\software\{0}".format(SaveFileName)
+            with open(file_path, 'wb') as f:
+                f.write(image_data)
+                return os.path.abspath(file_path)
+        except Exception:
+            return False

@@ -19,7 +19,7 @@ logging.info(
 # 一些默认常量
 SERVER_TIMEOUT = 5
 SERVER_PORT = 14514
-SERVER_HOST: str
+SERVER_HOST: str="127.0.0.1"
 
 
 # 以下进行配置文件读取
@@ -66,11 +66,11 @@ class Client(s.socket):
 
         # self.software_lib_data=self.get_software_lib_static_data() #获取初始软件库信息
     def init(self):
+        setup()
         r=self.go()
-
-        self.software_lib_data = self.get_software_lib_static_data()
-
-        logging.info("[client] get_softwareLib_data:{0}".format(self.software_lib_data))
+        if r is True:
+            self.software_lib_data = self.get_software_lib_static_data()
+            logging.info("[client] get_softwareLib_data:{0}".format(self.software_lib_data))
         return r
     def go(self):
         global SERVER_HOST, SERVER_PORT, SERVER_TIMEOUT

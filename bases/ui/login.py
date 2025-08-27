@@ -14,8 +14,9 @@ from PySide2.QtWidgets import *
 
 from qfluentwidgets import LineEdit
 from qfluentwidgets import PrimaryPushButton,CheckBox
-
-import configures.qrc.LoginQRC_rc
+import sys
+sys.path.append("..")
+from ..qrc import LoginQRC_rc
 
 
 class CheckBox_(CheckBox):
@@ -23,7 +24,8 @@ class CheckBox_(CheckBox):
         super().__init__(txt)
         self.if_next_show_tips=True
 
-class LoginPage(object):
+
+class LoginPage():
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")

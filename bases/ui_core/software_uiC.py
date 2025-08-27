@@ -1,11 +1,14 @@
-import os.path
+import os.path, sys
 
-import functions
-from configures.bases.gui.default.SoftwareLib_GUI import *
-from functions import API
+from bases.ui.software import *
 
 from PySide2.QtGui import QIcon
 from json import dumps
+
+from bases.api import (core, web)
+from bases.api.base import APPLICATION_ROOT_DIR
+
+
 class AppCard(CardWidget):
     def __init__(self, icon, title, content, address:list, func, type_:str,parent=None,btn_tips="下载"):
         """
@@ -51,31 +54,28 @@ class AppCard(CardWidget):
 
         self.downloadButton.clicked.connect(lambda :func(title,type_,address))
 
+
 class softwareLib_ui(SoftwareLibPage):
     def __init__(self, parents=None):
         super().__init__(parents)
 
-        self.api=API()
-        # print(1)
+        self.core_api = core.API()
+        self.web_api = web.API()
         self.setupUi()
-        # self.retranslateUi()
         self._contents_init()
-        # self.load_data_contents()
-
-        # self.more_UI_set()
     def _contents_init(self):
 
-        if not os.path.exists(functions.APPLICATION_ROOT_DIR+"\\data\\software"):
-            os.mkdir(functions.APPLICATION_ROOT_DIR+"\\data\\software")
+        if not os.path.exists(APPLICATION_ROOT_DIR+"\\data\\software"):
+            os.mkdir(APPLICATION_ROOT_DIR+"\\data\\software")
         """初始化软件库内容"""
-        result=self.api.get_static_software_lib_data()
+        result=self.web_api.get_static_software_lib_data()
         # print(1)
         print(result)
         if type(result) is str:
             self.show_edit_error(result)
         else:
             self.data=result
-            with open(functions.APPLICATION_ROOT_DIR+"\\data\\software\\SoftwareLibData.json", "w", encoding="utf-8") as file:
+            with open(APPLICATION_ROOT_DIR+"\\data\\software\\SoftwareLibData.json", "w", encoding="utf-8") as file:
                 file.write(dumps(result))
             self.load_data_contents()
 
@@ -85,9 +85,9 @@ class softwareLib_ui(SoftwareLibPage):
         用于刷新内容
         :return:
         """
-        result=self.api.get_softwareLib_data()
+        result=self.web_api.get_softwareLib_data()
         self.data=result
-        with open(functions.APPLICATION_ROOT_DIR+"\\data\\software\\SoftwareLibData.json", "w", encoding="utf-8") as file:
+        with open(APPLICATION_ROOT_DIR+"\\data\\software\\SoftwareLibData.json", "w", encoding="utf-8") as file:
             file.write(dumps(result))
         self.load_data_contents()
     def load_data_contents(self):
@@ -100,18 +100,18 @@ class softwareLib_ui(SoftwareLibPage):
         data_labels={}
         for __labels__ in self.data.keys():
             temp=self.data[__labels__] #获取到名为 __labels__ 的软件信息(dict)详情格式见相关文件
-            is_exist=self.api.Software_if_exist(__labels__)
+            is_exist=self.core_api.software_if_exist(__labels__)
             """ $$$TIPS!!!&&&
             在此文件中使用qfluentwidgets的图标库需通过 FluentIcon(FluentIcon.APPLICATION)使用
             而不能使用 FluentIcon.xxx !会导致堵塞/GUI不显示/隐藏式报错，不知原因！  FluentIcon(FluentIcon.APPLICATION)
             """
-            icon=QIcon(functions.get_icons_from_url(temp["icon"],__labels__+".png"))
+            icon=QIcon(self.web_api.get_icons_from_url(temp["icon"],__labels__+".png"))
             data_labels[__labels__]=AppCard(
                 icon=icon if not temp["icon"].isspace() else FluentIcon(FluentIcon.APPLICATION) ,
                 title=__labels__,
                 content=temp["description"],
                 address=temp["download"],
-                func=self.download_signal if not is_exist else self.api.open_software,
+                func=self.download_signal if not is_exist else self.core_api.open_software,
                 type_=temp["info"]["type"],
                 parent=self.scrollAreaWidgetContents,
                 btn_tips="下载" if not is_exist else "打开"
@@ -140,8 +140,8 @@ class softwareLib_ui(SoftwareLibPage):
         """
 
         for __address__ in address:#取出一个下载地址
-            if not self.api.Software_if_exist(title): #判断是否已经下载了这个软件
-                self.api.download_software(title,type_,__address__,thread_count=int(self.threads_spinBox.value()))#int(self.theads_spinBox.value())) #下载
+            if not self.core_api.software_if_exist(title): #判断是否已经下载了这个软件
+                self.web_api.download_software(title,type_,__address__,thread_count=int(self.threads_spinBox.value()))#int(self.theads_spinBox.value())) #下载
             else:
                 # self.show_edit_error("已经下载了该软件了喔 QAQ")
                 self.show_top_error("已经下载了该软件了喔 QAQ")
@@ -153,4 +153,4 @@ class softwareLib_ui(SoftwareLibPage):
         :param title:
         :return:
         """
-        self.api.open_software(title)
+        self.core_api.open_software(title)
