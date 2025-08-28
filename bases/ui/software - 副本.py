@@ -22,21 +22,21 @@ from qfluentwidgets import (PushButton, SpinBox, LineEdit, SingleDirectionScroll
 # from qfluentwidgets import SpinBox,Flyout,InfoBarIcon,FlyoutAnimationType,CardWidget
 
 
-class SoftwareLibPage(object):
-    # def __init__(self, parents=None):
-    #     super().__init__(parents)
-    #
-    #     # self.setupUi()
+class SoftwareLibPage(QFrame):
+    def __init__(self, parents=None):
+        super().__init__(parents)
+        self.data = {}
+        # self.setupUi()
 
     def setupUi(self,Form):
-        if not Form.objectName():
-            Form.setObjectName(u"Software_form")
-        Form.resize(704, 500)
-        self.verticalLayout = QVBoxLayout(Form)
+        if not self.objectName():
+            self.setObjectName(u"Form")
+        self.resize(704, 500)
+        self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName(u"verticalLayout")
         # self.verticalLayout.setSpacing(50)
         # self.a_spacer_v=QSpacerItem(20, 40, QSizePolicy.Fixed, QSizePolicy.Expanding)
-        self.up = QFrame(Form)
+        self.up = QFrame(self)
         self.up.setObjectName(u"up")
 
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -178,9 +178,9 @@ class SoftwareLibPage(object):
 
         self.verticalLayout.addWidget(self.down)
 
-        self.retranslateUi(Form)
+        self.retranslateUi()
 
-        QMetaObject.connectSlotsByName(Form)
+        QMetaObject.connectSlotsByName(self)
 
     # setupUi
 
@@ -206,8 +206,8 @@ class SoftwareLibPage(object):
             parent=self
         )
 
-    def retranslateUi(self,Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+    def retranslateUi(self):
+        self.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.title.setText(QCoreApplication.translate("Form", u"\u8f6f\u4ef6\u5e93", None))
         self.subtitle.setText(QCoreApplication.translate("Form",
                                                          u"\u8fd9\u70e7\u5f55\u4e86\u4e00\u4e9b\u53ef\u80fd\u5e38\u7528\u7684\u8f6f\u4ef6",

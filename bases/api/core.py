@@ -141,7 +141,7 @@ class API(object):
 
     # @staticmethod
     def root_ui_exec(self) -> None:
-        from bases.ui_core.home_uiC import execute
+        from bases.ui_core.root import execute
         # 将execute的导入放在此处，旨在进行延迟导入，防止循环导入导致importerror
         execute()
 

@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QApplication
 from PySide2.QtCore import Qt
 
 from qfluentwidgets import (setTheme,Theme)
-from bases.ui_core import login_uiC,home_uiC
+from bases.ui_core import login_uiC
 
 import sys, os
 import PySide2

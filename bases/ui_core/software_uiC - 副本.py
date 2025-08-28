@@ -3,7 +3,6 @@ import os.path, sys
 from bases.ui.software import *
 
 from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QFrame
 from json import dumps
 
 from bases.api import (core, web)
@@ -56,14 +55,13 @@ class AppCard(CardWidget):
         self.downloadButton.clicked.connect(lambda :func(title,type_,address))
 
 
-class softwareLib_ui(SoftwareLibPage,QFrame):
+class softwareLib_ui(SoftwareLibPage):
     def __init__(self, parents=None):
         super().__init__(parents)
-        self.setupUi(self)
 
-        self.data = {}
         self.core_api = core.API()
         self.web_api = web.API()
+        self.setupUi()
         self._contents_init()
     def _contents_init(self):
 
