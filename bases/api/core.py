@@ -146,7 +146,7 @@ class API(object):
         execute()
 
     @staticmethod
-    def software_if_exist(title: str) -> bool:
+    def software_if_exist(title: str, type_: str) -> bool:
         """
         判断是否已经下载了该软件
         :param title: 软件名称
@@ -154,8 +154,9 @@ class API(object):
         """
         with os.scandir(APPLICATION_ROOT_DIR + r"\data\software") as entries:  # 遍历出来的目录名称符合软件名称，可通过是否存在同名目录来判断是否存在该软件。
             for entry in entries:
-                if entry.is_dir() and entry.name == title:
-                    return True
+                if entry.is_dir() and entry.name == title: #确定文件夹存在"
+                    if os.path.exists(os.path.join(entry.path,f"{title}.{type_}")): #确定软件实际内容存在
+                        return True
         return False
 
     @staticmethod

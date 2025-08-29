@@ -12,36 +12,68 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
+from qfluentwidgets import ElevatedCardWidget, IconWidget, FluentIcon, CaptionLabel
+
+
+
+class FastAppCard(ElevatedCardWidget):
+    icon_size=(20,20)
+    def __init__(self,Icon=None, subtitle="",parents=None):
+        super().__init__(parent=parents)
+        self.iconLabel = IconWidget(Icon) #使用flunticon的图标库
+        self.iconLabel.setFixedSize(self.icon_size[0],self.icon_size[1]) #设置图标大小
+        # self.iconLabel.setObjectName("_Center_icon_icon") #好像没啥用，但是不敢动
+        self.label = CaptionLabel(subtitle, parent=self) #设置小标题
+
+        self.vBoxLayout = QVBoxLayout(self)
+        self.vBoxLayout.setAlignment(Qt.AlignCenter)
+        self.vBoxLayout.addStretch(1)
+        self.vBoxLayout.addWidget(self.iconLabel, 0, Qt.AlignCenter)
+        self.vBoxLayout.addStretch(1)
+        self.vBoxLayout.addWidget(self.label, 0, Qt.AlignHCenter | Qt.AlignBottom)
+
+class HELP_CARD(FastAppCard):
+    def __init__(self, parents=None):
+        super().__init__(Icon=FluentIcon.HELP,subtitle="help",parents=parents)
+
+class SETTING_CARD(FastAppCard):
+    def __init__(self, parents=None):
+        super().__init__(Icon=FluentIcon.SETTING,subtitle="setting",parents=parents)
+
+
+class ME_CARD(FastAppCard):
+    def __init__(self, parents=None):
+        super().__init__(Icon=FluentIcon.PEOPLE,subtitle="Me",parents=parents)
 
 class HomePage(object):
     def setupUi(self, Form):
         if not Form.objectName():
-            Form.setObjectName(u"Form")
+            Form.setObjectName(u"HomePage")
         Form.resize(656, 463)
         self.gridLayout = QGridLayout(Form)
         self.gridLayout.setObjectName(u"gridLayout")
         self.down = QFrame(Form)
         self.down.setObjectName(u"down")
-        self.down.setMinimumSize(QSize(200, 250))
+        self.down.setMinimumSize(QSize(200, 200))
         self.down.setFrameShape(QFrame.StyledPanel)
         self.down.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.down)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.fc1 = QFrame(self.down)
+        self.fc1 = SETTING_CARD(self.down)
         self.fc1.setObjectName(u"fc1")
         self.fc1.setFrameShape(QFrame.StyledPanel)
         self.fc1.setFrameShadow(QFrame.Raised)
 
         self.horizontalLayout.addWidget(self.fc1)
 
-        self.fc2 = QFrame(self.down)
+        self.fc2 = ME_CARD(self.down)
         self.fc2.setObjectName(u"fc2")
         self.fc2.setFrameShape(QFrame.StyledPanel)
         self.fc2.setFrameShadow(QFrame.Raised)
 
         self.horizontalLayout.addWidget(self.fc2)
 
-        self.fc3 = QFrame(self.down)
+        self.fc3 = HELP_CARD(self.down)
         self.fc3.setObjectName(u"fc3")
         self.fc3.setFrameShape(QFrame.StyledPanel)
         self.fc3.setFrameShadow(QFrame.Raised)
@@ -58,15 +90,15 @@ class HomePage(object):
 
         self.gridLayout.addWidget(self.down, 2, 0, 1, 3)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Maximum)
+        self.verticalSpacer = QSpacerItem(20, 450, QSizePolicy.Minimum, QSizePolicy.Preferred)
 
         self.gridLayout.addItem(self.verticalSpacer, 1, 0, 1, 4)
 
         self.upleft = QWidget(Form)
         self.upleft.setObjectName(u"upleft")
-        self.upleft.setMinimumSize(QSize(0, 0))
+        self.upleft.setMinimumSize(QSize(300,130))
         self.upleft.setStyleSheet(u"#upleft{\n"
-"background-color:rgba(255, 255, 255,10);\n"
+"background-color:rgba(255, 255, 255,20);\n"
 "border-radius:10px;\n"
 "}")
         self.title = QLabel(self.upleft)
@@ -94,13 +126,14 @@ class HomePage(object):
 
         self.upright = QWidget(Form)
         self.upright.setObjectName(u"upright")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
+        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        self.upright.setMinimumSize(QSize(400, 130))
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.upright.sizePolicy().hasHeightForWidth())
         self.upright.setSizePolicy(sizePolicy)
         self.upright.setStyleSheet(u"#upright{\n"
-"background-color:rgba(255, 255, 255,150);\n"
+"background-color:rgba(255, 255, 255,20);\n"
 "border-radius:10px;\n"
 "}")
         self.gridLayout_2 = QGridLayout(self.upright)
@@ -159,7 +192,7 @@ class HomePage(object):
         sizePolicy2.setHeightForWidth(self.server_status_icon.sizePolicy().hasHeightForWidth())
         self.server_status_icon.setSizePolicy(sizePolicy2)
         self.server_status_icon.setMinimumSize(QSize(0, 20))
-        self.server_status_icon.setMaximumSize(QSize(16777215, 114514))
+        # self.server_status_icon.setMaximumSize(QSize(16777215, 114514))
         self.server_status_icon.setBaseSize(QSize(0, 20))
         self.server_status_icon.setStyleSheet(u"font: 50pt \"Microsoft YaHei UI\";\n"
 "color:green;")

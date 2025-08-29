@@ -185,6 +185,8 @@ tips:本次测试后服务器配置组仍然设置在“test”本地调试
 
 
 
+###### 在此版本前，已基本完成对月版本 R-beta 25w08*的开发
+
 ###### R-beta 25w08a-2025/8/28:
 
 ```python
@@ -199,5 +201,25 @@ tips:本次测试后服务器配置组仍然设置在“test”本地调试
 4.进一步完善了重构后的core.py
 5.优化了登录时的错误反馈逻辑，引入了新的自定义错误类，继承Exception,避免了意外catch其他错误的情况。
 6.优化了部分类型判断的代码逻辑
+```
+
+
+
+###### R-beta 25w08b-2025/8/29:
+
+```python
+1.完成了home界面的一些基本优化
+2.完善了软件库的刷新功能
+3.完善了软件库与api的交流逻辑
+4.对Exception有了更完善的catch，并且适配了ui提示框，并完善了先前的捕捉逻辑
+5.优化了core_api中
+	@staticmethod
+    def software_if_exist(title: str, type_: str) -> bool
+    的逻辑
+6.更改了homePage控件的object名为: "HomePage"
+7.正确处理了多线程下载与ui之间的callback，先前的属于错误代码。
+  现在在下在类中添加了新的信号 over=Signal(str)，并与参数中的槽相匹配,负责下载完成后调用起
+                                                        @staticmethod
+                                                        def __localize_file__(**kwargs)。
 ```
 

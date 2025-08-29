@@ -34,7 +34,7 @@ class DownloadThread(QThread):
 
 class DownloadCoreThread(QThread):
     trigger = Signal(str)
-
+    over = Signal(str) #发射后用于唤醒__localiser__
     def __init__(self, **kwargs):
         super().__init__()
 
@@ -48,41 +48,44 @@ class DownloadCoreThread(QThread):
 
         logging.info("[web.py] [DownloadCoreThread.__init__] CoreThread init over.")
     def run(self):
-        self.url_init()
-        # 创建线程并下载
-        logging.info("[web.py] [DownloadCoreThread.run] Gotten into CoreThread.")
-        thread_list = []
-
-        for i in range(self.thread_count):
-            thread = DownloadThread(self.bytes_queue, self.url, self.temp_Dir)
-            thread.start()
-            thread_list.append(thread)
-
-        while thread_list:
-            for __thread__ in thread_list:
-                if not __thread__.isRunning() or __thread__.isFinished():
-                    thread_list.remove(__thread__)
-        else:
-            self.trigger.emit("下载完成")
-    def url_init(self):
-        """通过计算文件大小分配线程任务"""
         try:
-            response = requests.head(self.url)
-            file_length = int(response.headers['Content-Length'])
-
-            self.bytes_queue = Queue()
-            start_bytes = -1
-            for i in range(self.copies_count):
-                bytes_size = int(file_length / self.copies_count) * i
-                if i == self.copies_count - 1:
-                    bytes_size = file_length
-                bytes_length = "{}-{}".format(start_bytes + 1, bytes_size)
-                self.bytes_queue.put([i, bytes_length])
-                start_bytes = bytes_size
-        except urllib3.exceptions.MaxRetryError or requests.exceptions.ConnectionError as e:
+            self.url_init()
+            # 创建线程并下载
+            logging.info("[web.py] [DownloadCoreThread.run] Gotten into CoreThread.")
+            thread_list = []
+            if self.thread_count > 0:
+                for i in range(self.thread_count):
+                    thread = DownloadThread(self.bytes_queue, self.url, self.temp_Dir)
+                    thread.start()
+                    thread_list.append(thread)
+            else:
+                self.trigger.emit("你的线程下载数设置为0！Nothing happened.")
+            while thread_list:
+                for __thread__ in thread_list:
+                    if not __thread__.isRunning() or __thread__.isFinished():
+                        thread_list.remove(__thread__)
+            else:
+                self.over.emit("下载完成")
+        except Exception as e:
             logging.error("[web.py] [DownloadCoreThread.url_init] Failed to get file size.\n          :------:------:------:          \n {0} \n".format(e))
             self.trigger.emit("Opps,下载出错了:( :{}".format(e))
             return False
+
+    def url_init(self):
+        """通过计算文件大小分配线程任务"""
+
+        response = requests.head(self.url)
+        file_length = int(response.headers['Content-Length'])
+        self.bytes_queue = Queue()
+        start_bytes = -1
+        for i in range(self.copies_count):
+            bytes_size = int(file_length / self.copies_count) * i
+            if i == self.copies_count - 1:
+                bytes_size = file_length
+            bytes_length = "{}-{}".format(start_bytes + 1, bytes_size)
+            self.bytes_queue.put([i, bytes_length])
+            start_bytes = bytes_size
+        #except urllib3.exceptions.MaxRetryError or requests.exceptions.ConnectionError or ConnectionRefusedError or urllib3.exceptions.NewConnectionError as e:
 
 
 class API( object):
@@ -120,7 +123,7 @@ class API( object):
         """
         return self.web_socket.software_lib_data
 
-    def download_software(self, title: str, type_: str, address: str, thread_count: int = 5, copies_count: int = 20):
+    def download_software(self, title: str, type_: str, address: str, thread_count: int = 5, copies_count: int = 20,callback=None):
         temp_Dir = APPLICATION_ROOT_DIR + r"\data\temp\{0}".format(title)
         filepath = APPLICATION_ROOT_DIR + r"\data\software\{0}".format(title)  # 下载后保存的文件路径
 
@@ -154,13 +157,17 @@ class API( object):
         )
 
         self.DMT.start()
-        self.DMT.trigger.connect(
+        self.DMT.over.connect(
             lambda :self.__localize_file__(
                 filetype=type_,filename=filename, filepath=filepath,
                 copies_count=copies_count,
                 temp_Dir=temp_Dir
             ),
         )
+
+        if callback is not None:
+            self.DMT.trigger.connect(callback)
+
         """
         致命BUG（已修复）
         经过部分线程代码逻辑改动后，运行时出现
@@ -169,8 +176,8 @@ class API( object):
             DMT=DownloadCoreThread(...) 改为->  self.DMT=DownloadCoreThread(...)
         bug修理完成.
         """
-
-    def __localize_file__(self, **kwargs):
+    @staticmethod
+    def __localize_file__(**kwargs):
         """
         用于本地化下载后的琐碎区块文件。
         功能包括
@@ -179,6 +186,7 @@ class API( object):
         :param kwargs:
         :return:
         """
+        print(1123141312)
         output_path = os.path.join(kwargs["filepath"], kwargs["filename"])
 
         #清理路径
