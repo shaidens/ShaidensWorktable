@@ -101,8 +101,9 @@ class API( object):
         result = self.web_socket.init()
         if result is not True:
             logging.error("[web.py]WebSocket init failed.")
+
             # 这意味着调用端需作出捕捉
-            raise NoConnection("WebSocket init failed.")
+            raise NoConnection(f"WebSocket init failed.")
         logging.info("[web.py]Init finished.")
 
     def login(self, invitation_code: str, loading_ui=None):
@@ -186,7 +187,7 @@ class API( object):
         :param kwargs:
         :return:
         """
-        print(1123141312)
+        # print(1123141312)
         output_path = os.path.join(kwargs["filepath"], kwargs["filename"])
 
         #清理路径

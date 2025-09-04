@@ -80,40 +80,52 @@ class login_ui(FramelessMainWindow, LoginPage): # class login_ui(FramelessMainWi
         loop = QEventLoop(self)
         QTimer.singleShot(500,loop.quit)
         loop.exec_()
-        #此处进行初始化后端配置
+        self.__basic_init__() #此处进行初始化后端配置
+        self.splashScreen.close()
+
+    def __basic_init__(self) -> bool:
+        """
+        讲负责初始化的内容分离到本方法中，便于多处使用不局限于只在createSubInterface中调用
+        :return:
+        """
         try:
             self.core_api = core.API()
-            self.web_api = web.API()
-            result = self.core_api.config_init()#r"C:/Users/shaid/Desktop/ShaidenWorkProject/Shaiden's(重定向)/Shaiden's(new)/bases/configures/groups/SST/") #此处设置配置组
+            result = self.core_api.config_init()  # r"C:/Users/shaid/Desktop/ShaidenWorkProject/Shaiden's(重定向)/Shaiden's(new)/bases/configures/groups/SST/") #此处设置配置组
 
             if self.core_api.IMI_STATUS:
                 self.invitation_edit.setText(self.core_api.LATEST_INVITATION)
                 self.if_memorize_invitation.if_next_show_tips = False
                 self.if_memorize_invitation.setChecked(True)
 
+            self.web_api = web.API()
+
             if isinstance(result, str):
                 self.show_top_error(result)
             elif self.core_api.IMI_STATUS:
                 self.complete_btn_pressed()
+
+            return True
         except MissedConfigures as e:
             self.splashScreen.close()
             self.show_top_error("你的工作台缺少必要的配置文件！请联系Shaiden解决 [%s]" % str(e))
-            return
+            return False
         except NoConnection as e:
             self.splashScreen.close()
             self.show_top_error("无法连接到服务器😑 [%s]" % str(e))
-            return
-        self.splashScreen.close()
-
+            return False
     def complete_btn_pressed(self) -> None:
+
         edit=self.invitation_edit.text()
         if edit and bool(re.match(r"^[A-Za-z0-9_-]*$",edit)):
             self.show_top_info("正在登陆中...")
+            loop = QEventLoop(self)
+            QTimer.singleShot(500, loop.quit)
+            loop.exec_()
             #伪延迟start
             # loop = QEventLoop(self)
             # QTimer.singleShot(250, loop.quit)
             # loop.exec_()
-
+            self.__basic_init__()
             result=self.web_api.login(edit)
             if isinstance(result, dict):
                 if self.core_api.IMI_STATUS:

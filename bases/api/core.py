@@ -1,3 +1,4 @@
+import ast
 
 from .base import *
 
@@ -60,7 +61,7 @@ class API(object):
                             if i.startswith("#"):  # 跳过注释行
                                 continue
                             if i.startswith("IMI_STATUS"):  # if_memorize_invitation是否记住邀请码
-                                self.IMI_STATUS = eval(i.split("=")[1])
+                                self.IMI_STATUS = ast.literal_eval(i.split("=")[1])
                                 logging.info("IMI_status:%s", self.IMI_STATUS)
                             if i.startswith("LATEST_INVITATION") and self.IMI_STATUS:  # if_memorize_invitation
                                 self.LATEST_INVITATION = i.split("=")[1]

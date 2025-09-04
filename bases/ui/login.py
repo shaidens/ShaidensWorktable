@@ -243,7 +243,7 @@ class LoginPage():
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer)
         pushButton_icon=QIcon()
-        pushButton_icon.addFile("./res/icon/complete.png")
+        pushButton_icon.addFile("./bases/res/icon/complete.png")
         self.pushButton = PrimaryPushButton(pushButton_icon,' ',parent=self.frame_4)
         self.pushButton.setObjectName(u"pushButton")
         sizePolicy2.setHeightForWidth(self.pushButton.sizePolicy().hasHeightForWidth())

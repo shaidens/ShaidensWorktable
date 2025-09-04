@@ -223,3 +223,13 @@ tips:本次测试后服务器配置组仍然设置在“test”本地调试
                                                         def __localize_file__(**kwargs)。
 ```
 
+
+
+###### R-beta 25w09a - 2025/9/4:
+
+```python
+1.优化了login_UIc的逻辑
+2.修复了core.py的小处路径bug
+3.优化了一个恶意代码执行漏洞
+```
+

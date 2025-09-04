@@ -7,6 +7,7 @@ import logging
 
 import simplejson as json
 
+from typing_extensions import Union
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s-%(name)s][web_socket] %(message)s')
 
 WORK_ROOT_DIR = os.path.dirname(__file__)  # 获取工作目录(web_socket)
@@ -26,7 +27,7 @@ SERVER_HOST: str="127.0.0.1"
 def setup():
     global SERVER_HOST, SERVER_PORT, SERVER_TIMEOUT
     try:
-        with open(CONFIGS_DIR + r"\configs\web_socket.sd", "r", encoding="utf-8") as f:
+        with open(CONFIGS_DIR + r"\\active\\web_socket.sd", "r", encoding="utf-8") as f:
             config = f.read()
             config = config.split("\n")
             for i in config:
@@ -65,14 +66,15 @@ class Client(s.socket):
         self.settimeout(int(SERVER_TIMEOUT))
 
         # self.software_lib_data=self.get_software_lib_static_data() #获取初始软件库信息
-    def init(self):
+    def init(self) -> bool:
         setup()
         r=self.go()
         if r is True:
             self.software_lib_data = self.get_software_lib_static_data()
             logging.info("[client] get_softwareLib_data:{0}".format(self.software_lib_data))
         return r
-    def go(self):
+
+    def go(self) -> Union[bool,str]:
         global SERVER_HOST, SERVER_PORT, SERVER_TIMEOUT
         try:
             # 解决socket.gaierror: [Errno 11001] getaddrinfo failed
