@@ -125,7 +125,7 @@ class login_ui(FramelessMainWindow, LoginPage): # class login_ui(FramelessMainWi
             # loop = QEventLoop(self)
             # QTimer.singleShot(250, loop.quit)
             # loop.exec_()
-            self.__basic_init__()
+            # self.__basic_init__()
             result=self.web_api.login(edit)
             if isinstance(result, dict):
                 if self.core_api.IMI_STATUS:

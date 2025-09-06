@@ -167,12 +167,16 @@ class softwareLib_ui(SoftwareLibPage,QFrame):
         try:
             for __address__ in address:#取出一个下载地址
                 if not self.core_api.software_if_exist(title,type_): #判断是否已经下载了这个软件
-                    self.web_api.download_software(title,
-                                                   type_,
-                                                   __address__,
-                                                   thread_count=int(self.threads_spinBox.value()),
-                                                   callback=self.show_top_info_slot
-                                                   )#int(self.theads_spinBox.value())) #下载
+                    if int(self.threads_spinBox.value())>0:
+                        self.show_top_info(f"正在下载 {title}")
+                        self.web_api.download_software(title,
+                                                       type_,
+                                                       __address__,
+                                                       thread_count=int(self.threads_spinBox.value()),
+                                                       callback=self.show_top_info_slot
+                                                       )#int(self.theads_spinBox.value())) #下载
+                    else:
+                        self.show_top_error(f"0个下载线程啥也干不了......")
                 else:
                     # self.show_edit_error("已经下载了该软件了喔 QAQ")
                     self.show_top_error("已经下载了该软件了喔 QAQ")
@@ -210,6 +214,17 @@ class softwareLib_ui(SoftwareLibPage,QFrame):
             position=InfoBarPosition.TOP,
             duration=time,
             orient=Qt.Horizontal,
+        )
+
+    def show_top_info(self, msg: str) -> None:
+        InfoBar.info(
+            title='qwq',
+            content=msg,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=3000,
+            parent=self
         )
 
     @Slot(str)

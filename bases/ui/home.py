@@ -103,7 +103,7 @@ class HomePage(object):
 "}")
         self.title = QLabel(self.upleft)
         self.title.setObjectName(u"title")
-        self.title.setGeometry(QRect(30, 30, 101, 41))
+        self.title.setGeometry(QRect(30, 30, 151, 41))
         self.title.setMinimumSize(QSize(101, 41))
         self.title.setStyleSheet(u"font: 25pt \"Microsoft YaHei UI\";\n"
 "color:white;")
@@ -210,7 +210,7 @@ class HomePage(object):
 
     def retranslateUi(self,Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
-        self.title.setText(QCoreApplication.translate("Form", u"Hello!", None))
+        self.title.setText(QCoreApplication.translate("Form", u"Greeting!", None))
         self.label.setText(QCoreApplication.translate("Form", u"\u6b22\u8fce\u8fdb\u5165\u5de5\u4f5c\u53f0", None))
         self.label_3.setText(QCoreApplication.translate("Form", u"Server", None))
         self.label_4.setText(QCoreApplication.translate("Form", u"[127.0.0.1]   From Tencent Beijing ", None))

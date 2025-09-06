@@ -216,6 +216,8 @@ class SoftwareLibPage(object):
         self.tasks_btn.setText(QCoreApplication.translate("Form", u"\u4efb\u52a1\u5217\u8868", None))
         self.treads_spinBox_tip.setText(
             QCoreApplication.translate("Form", u"\u4e0b\u8f7d\u7ebf\u7a0b\u6570\uff1a", None))
+        self.threads_spinBox.setValue(10)
+
         self.search_btn.setText(QCoreApplication.translate("Form", u"\u641c\u7d22", None))
 
     # retranslateUi
